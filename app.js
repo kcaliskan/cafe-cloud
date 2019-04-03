@@ -28,14 +28,58 @@ function renderCafe(doc) {
   });
 }
 
-//gettin data
-db.collection("cafes")
-  .get()
-  .then(snapshot => {
-    snapshot.docs.forEach(doc => {
-      renderCafe(doc);
-    });
+// real-time data listener
+db.collection("cafes").onSnapshot(snapshot => {
+  let changes = snapshot.docChanges();
+  changes.forEach(change => {
+    if (change.type == "added") {
+      renderCafe(change.doc);
+    } else if (change.type == "removed") {
+      let li = cafeList.querySelector("[data-id=" + change.doc.id + "]");
+      cafeList.removeChild(li);
+    }
   });
+});
+
+// getting data
+// db.collection("cafes")
+//   .get()
+//   .then(snapshot => {
+//     snapshot.docs.forEach(doc => {
+//       renderCafe(doc);
+//     });
+//   });
+
+// //making queries
+// db.collection("cafes")
+//   .where("city", "==", "New York")
+//   .get()
+//   .then(snapshot => {
+//     snapshot.docs.forEach(doc => {
+//       renderCafe(doc);
+//     });
+//   });
+
+// //ordering data
+// db.collection("cafes")
+//   .orderBy("name")
+//   .get()
+//   .then(snapshot => {
+//     snapshot.docs.forEach(doc => {
+//       renderCafe(doc);
+//     });
+//   });
+
+// query & order
+// db.collection("cafes")
+//   .where("city", "==", "Manhattan")
+//   .orderBy("name")
+//   .get()
+//   .then(snapshot => {
+//     snapshot.docs.forEach(doc => {
+//       renderCafe(doc);
+//     });
+//   });
 
 // saving data
 form.addEventListener("submit", e => {
